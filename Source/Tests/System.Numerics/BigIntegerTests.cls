@@ -258,6 +258,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HA, "x", "0a"
             Test.Use &HFFF80000, "x", "80000"
             Test.Use &HFFF80000, "x8", "fff80000"
+            Test.Use "&hF14237FFAAC086455192", "x", "f14237ffaac086455192"
             
         Case "Compare_WithWithValues_ReturnsExpected"
             Test.Use(CBigInt(0), CBigInt(0)).Expect Iz.EqualTo(0)
@@ -578,6 +579,17 @@ Public Sub Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatExc
     AssertFormatException Err
 End Sub
 
+Public Sub Parse_WithFrenchCulture_ParsesWithSpaceAsGroupSeparator()
+    Dim Provider As CultureInfo
+    Dim Actual As BigInteger
+    
+    Set Provider = NewCultureInfo("fr-FR")
+    
+    Set Actual = BigInteger.Parse("9 031 425 666 123 546,00", NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands, Provider)
+    
+    Assert.That Actual.ToString, Iz.EqualTo("9031425666123546")
+End Sub
+
 Public Sub ToString_WithNoFormatting_ReturnsDefault(ByVal Value As Long, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String
@@ -603,7 +615,7 @@ Public Sub ToString_WithLargeExponent_ReturnsFormattedNumber()
     Dim Number As BigInteger
     Dim Actual As String
     
-    Set Number = BigInteger.Pow(CBigInt(Int64.MaxValue), 53)           ' "1.377703e+1005"
+    Set Number = BigInteger.Pow(CBigInt(Int64.MaxValue), 53) ' "1.377703e+1005"
 
     Actual = Number.ToString("e")
     
